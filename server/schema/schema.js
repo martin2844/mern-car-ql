@@ -13,7 +13,7 @@ const _ = require('lodash')
 
 
 //destructure object type from graphql, and more
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
+const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
 
 // dummy data to test
 
@@ -22,20 +22,47 @@ let cars = [
         model: "NX2000",
         type: "legend",
         manufactureDate: 1992,
-        id: '1'
+        id: '1',
+        makerId: "1"
     },
     {
         model: "Skyline",
         type: "legend",
         manufactureDate: 1990,
-        id: '2'
-    }
+        id: '2',
+        makerId: "1"
+    },
     {
         model: "Camry",
         type: "sedan",
         manufactureDate: 1998,
-        id: '3'
+        id: '3',
+        makerId: "2"
     }
+]
+
+let makers = [
+    {   
+        id: "1",
+        name: "Nissan",
+        foundedDate: 1932,
+        country: "Japan"
+        
+    },
+    {   
+        id: "2",
+        name: "Toyota",
+        foundedDate: 1922,
+        country: "Japan"
+        
+    },
+    {   
+        id: "3",
+        name: "Ford",
+        foundedDate: 1898,
+        country: "USA"
+        
+    },
 ]
 
 //first define the object type
@@ -46,10 +73,37 @@ const CarType = new GraphQLObjectType({
     //es6 arrow type function which returns directly via parenthesis.
     fields: () => ({
         //define type of data
-        id: {type: GraphQLString },
+        id: {type: GraphQLID },
         model: {type: GraphQLString },
         type: {type: GraphQLString },
-        manufactureDate: {type: GraphQLInt }
+        manufactureDate: {type: GraphQLInt },
+        //relate types.
+        maker: {
+            type: MakeType,
+            resolve(parent, args) {
+                //graphql is resolving who the maker is by searching the
+                //parent element, which is the car itself, grabbing makerId
+                // which is defined in that object, and using it to find the maker object
+                return _.find(makers, {id: parent.makerId});
+            }
+        }
+
+    })
+})
+
+
+
+//define Make type object, this is the brand of the car
+const MakeType = new GraphQLObjectType({
+    name: 'Make',
+    //fields will be a function in order to be relatad with other types
+    //es6 arrow type function which returns directly via parenthesis.
+    fields: () => ({
+        //define type of data
+        id: {type: GraphQLID },
+        name: {type: GraphQLString },
+        foundedDate: {type: GraphQLInt },
+        country: {type: GraphQLString}
 
     })
 })
@@ -63,7 +117,7 @@ const RootQuery = new GraphQLObjectType({
         //defines the name of query
         car: {
             type: CarType,
-            args: {id: {type: GraphQLString}},
+            args: {id: {type: GraphQLID}},
             resolve(parent, args) {
                 // code to get data from db / or other source
                 // we will get for ex. the args.id to search in our mongodb by ID
@@ -71,7 +125,15 @@ const RootQuery = new GraphQLObjectType({
                 //use lodash find to look for the id within the cars dummy array.
                 return _.find(cars, {id: args.id});
             }
+        },
+        make: {
+            type: MakeType,
+            args: {id: {type: GraphQLID}},
+            resolve(parent, args) {
+                return _.find(makers, {id: args.id})
+            }
         }
+        
     }
 })
 

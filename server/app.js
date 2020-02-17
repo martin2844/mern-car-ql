@@ -16,7 +16,8 @@ const app = express();
 //6. setup middleware for express, so that it can understand graphql
 app.use('/graphql', graphqlHTTP({
     //use es6, to shorten schema:schema to schema
-    schema
+    schema,
+    graphiql: true
 
 }));
 
