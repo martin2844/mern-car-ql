@@ -13,7 +13,7 @@ const _ = require('lodash')
 
 
 //destructure object type from graphql, and more
-const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
+const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList } = graphql;
 
 // dummy data to test
 
@@ -38,6 +38,24 @@ let cars = [
         manufactureDate: 1998,
         id: '3',
         makerId: "2"
+    },
+    {
+        model: "Supra",
+        type: "legend",
+        manufactureDate: 1997,
+        makerId: "2"
+    },
+    {
+        model: "Crown Victoria",
+        type: "sedan",
+        manufactureDate: 1994,
+        makerId: "3"
+    },
+    {
+        model: "Windstar",
+        type: "minivan",
+        manufactureDate: 1996,
+        makerId: "3"
     }
 ]
 
@@ -103,7 +121,16 @@ const MakeType = new GraphQLObjectType({
         id: {type: GraphQLID },
         name: {type: GraphQLString },
         foundedDate: {type: GraphQLInt },
-        country: {type: GraphQLString}
+        country: {type: GraphQLString},
+        cars: {
+            //this is different than the car type, because a car type has only one maker, whilst a maker can have
+            //a whole list of car types
+            type: new GraphQLList(CarType),
+            resolve(parent, args){ 
+                //lodash method to filter all car types, via the maker Id contained in the car type
+                return _.filter(cars, {makerId: parent.id});
+            }
+        }
 
     })
 })
@@ -131,6 +158,21 @@ const RootQuery = new GraphQLObjectType({
             args: {id: {type: GraphQLID}},
             resolve(parent, args) {
                 return _.find(makers, {id: args.id})
+            }
+        },
+        cars: {
+            //since this returns all cars, its not a CarType but a graphql list type
+            type: new GraphQLList(CarType),
+            resolve(parent,args){
+                //since we arent sorting anything, we just need to return the whole cars array
+                return cars
+            }
+        },
+        makers: {
+            type: new GraphQLList(MakeType),
+            resolve(/*parent,args*/) {
+                //since we arent sorting anything, we just need to return the whole maker array
+                return makers;
             }
         }
         
