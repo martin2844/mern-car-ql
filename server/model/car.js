@@ -5,7 +5,7 @@ const carSchema = new Schema({
     model: String,
     type: String,
     manufactureDate: Number,
-    makerId: String
+    makeId: String
 });
 
 module.exports = mongoose.model("Car", carSchema);

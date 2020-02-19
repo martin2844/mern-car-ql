@@ -9,79 +9,24 @@ interact with the data, to get the data, to mutate it. */
 const _ = require('lodash')
 
 
+//import Schemas from mongodb models
+const Car = require('../model/car');
+const Make = require('../model/make');
+
 
 
 
 //destructure object type from graphql, and more
-const { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList } = graphql;
+const { GraphQLObjectType, 
+    GraphQLID, 
+    GraphQLString, 
+    GraphQLInt, 
+    GraphQLSchema, 
+    GraphQLList,
+    GraphQLNonNull
 
-// dummy data to test
+} = graphql;
 
-let cars = [
-    {
-        model: "NX2000",
-        type: "legend",
-        manufactureDate: 1992,
-        id: '1',
-        makerId: "1"
-    },
-    {
-        model: "Skyline",
-        type: "legend",
-        manufactureDate: 1990,
-        id: '2',
-        makerId: "1"
-    },
-    {
-        model: "Camry",
-        type: "sedan",
-        manufactureDate: 1998,
-        id: '3',
-        makerId: "2"
-    },
-    {
-        model: "Supra",
-        type: "legend",
-        manufactureDate: 1997,
-        makerId: "2"
-    },
-    {
-        model: "Crown Victoria",
-        type: "sedan",
-        manufactureDate: 1994,
-        makerId: "3"
-    },
-    {
-        model: "Windstar",
-        type: "minivan",
-        manufactureDate: 1996,
-        makerId: "3"
-    }
-]
-
-let makers = [
-    {   
-        id: "1",
-        name: "Nissan",
-        foundedDate: 1932,
-        country: "Japan"
-        
-    },
-    {   
-        id: "2",
-        name: "Toyota",
-        foundedDate: 1922,
-        country: "Japan"
-        
-    },
-    {   
-        id: "3",
-        name: "Ford",
-        foundedDate: 1898,
-        country: "USA"
-        
-    },
-]
 
 //first define the object type
 //define Car type object
@@ -102,7 +47,8 @@ const CarType = new GraphQLObjectType({
                 //graphql is resolving who the maker is by searching the
                 //parent element, which is the car itself, grabbing makerId
                 // which is defined in that object, and using it to find the maker object
-                return _.find(makers, {id: parent.makerId});
+               // return _.find(makers, {id: parent.makerId});
+               return Make.findById(parent.makeId);
             }
         }
 
@@ -128,7 +74,8 @@ const MakeType = new GraphQLObjectType({
             type: new GraphQLList(CarType),
             resolve(parent, args){ 
                 //lodash method to filter all car types, via the maker Id contained in the car type
-                return _.filter(cars, {makerId: parent.id});
+               // return _.filter(cars, {makerId: parent.id});
+               return Car.find({makeId: parent.id});
             }
         }
 
@@ -141,7 +88,7 @@ const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     // we dont need to wrap fields inside a function
     fields: {
-        //defines the name of query
+        //defines the name of query to be made
         car: {
             type: CarType,
             args: {id: {type: GraphQLID}},
@@ -150,14 +97,18 @@ const RootQuery = new GraphQLObjectType({
                 // we will get for ex. the args.id to search in our mongodb by ID
 
                 //use lodash find to look for the id within the cars dummy array.
-                return _.find(cars, {id: args.id});
+                //return _.find(cars, {id: args.id});
+
+                return Car.findById(args.id);
+
             }
         },
         make: {
             type: MakeType,
             args: {id: {type: GraphQLID}},
             resolve(parent, args) {
-                return _.find(makers, {id: args.id})
+               // return _.find(makers, {id: args.id})
+               return Make.findById(args.id);
             }
         },
         cars: {
@@ -165,22 +116,73 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(CarType),
             resolve(parent,args){
                 //since we arent sorting anything, we just need to return the whole cars array
-                return cars
+                //return cars
+                //return all cars by find.({});
+                return Car.find({});
             }
         },
-        makers: {
+        makes: {
             type: new GraphQLList(MakeType),
             resolve(/*parent,args*/) {
                 //since we arent sorting anything, we just need to return the whole maker array
-                return makers;
+                //return makers;
+                return Make.find({});
             }
         }
         
     }
 })
 
+
+//mutations are to interact with the DB, not get data but change it
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addMake: {
+            type: MakeType,
+            args: {
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                foundedDate: { type: new GraphQLNonNull(GraphQLInt) },
+                country: { type: new GraphQLNonNull(GraphQLString) }
+
+            },
+            resolve(parent, args){ 
+                //define a new Make from mongoose
+                let make = new Make({
+                    name: args.name,
+                    foundedDate: args.foundedDate,
+                    country: args.country
+                });
+                //once defined save it 
+                return make.save();
+            }
+        },
+        addCar: {
+            type: CarType,
+            args: {
+                // the graphqlnon null avoids string being empty when adding to db
+                model: { type: new GraphQLNonNull(GraphQLString) },
+                type: { type: new GraphQLNonNull(GraphQLString) },
+                manufactureDate: { type: new GraphQLNonNull(GraphQLInt) },
+                makeId: { type: new GraphQLNonNull(GraphQLID) }
+            },
+            resolve(parent, args){
+                let car = new Car({
+                    model: args.model,
+                    type: args.type,
+                    manufactureDate: args.manufactureDate,
+                    makeId: args.makeId
+                });
+                return car.save();
+            }
+        }
+    }
+})
+
 //export this to be used by express as a module.export
 module.exports = new GraphQLSchema({
     // export as a graphqlschema, and the query is the const we defined as RootQuery
-    query: RootQuery
+    query: RootQuery,
+    //pass in our const Mutation as whats needed for a graphql Mutation
+    mutation: Mutation
 })
