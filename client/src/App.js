@@ -1,7 +1,12 @@
 import React from 'react';
-import CarList from './components/CarList';
 import ApolloClient from 'apollo-boost';
 import {ApolloProvider} from '@apollo/react-hooks';
+
+
+
+import CarList from './components/CarList';
+import AddCar from './components/AddCar';
+
 
 //apollo client setup
 const client = new ApolloClient({
@@ -17,6 +22,8 @@ class App extends React.Component {
 
       <h1>My Favourite Cars</h1>
       <CarList/>
+
+      <AddCar/>
 
 
       </div>

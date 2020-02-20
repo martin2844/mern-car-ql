@@ -8,6 +8,9 @@ const schema = require('./schema/schema');
 //8. require mongoose
 const mongoose = require('mongoose');
 
+//10.require cors
+const cors = require('cors');
+
 //9. Connect to mongodb using mongoose connect. Using Mongo Atlas
 mongoose.connect( "mongodb+srv://admin:algo1234@cluster0-ekehs.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true,
@@ -22,6 +25,9 @@ mongoose.connect( "mongodb+srv://admin:algo1234@cluster0-ekehs.mongodb.net/test?
 
 //2. declare app
 const app = express();
+
+//11. allow cors
+app.use(cors());
 
 
 //6. setup middleware for express, so that it can understand graphql
