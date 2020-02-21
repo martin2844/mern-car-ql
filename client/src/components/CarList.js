@@ -1,20 +1,6 @@
-import React, { Component } from 'react'
-import { gql } from 'apollo-boost'
+import React, { Component } from 'react';
 import { graphql } from '@apollo/react-hoc';
-
-const getCarQuery = gql`
-    {
-        cars {
-            maker {
-              name
-            }
-            model
-            type
-            manufactureDate
-            id
-          }
-    }
-`
+import { getCarQuery } from '../queries/queries';
 
 
 class CarList extends Component {
@@ -39,7 +25,6 @@ class CarList extends Component {
 
     render() {
         //this.props because its a class component. check
-        console.log(this.props)
         return (
             <div id="car-list">
                 {this.displayCars()}
