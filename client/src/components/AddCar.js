@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { graphql } from '@apollo/react-hoc';
-import { getMakeQuery } from '../queries/queries';
+import { getMakeQuery, addCarMutation, getCarQuery } from '../queries/queries';
+import compose from "lodash.flowright";
 
 
 
@@ -12,12 +13,13 @@ class AddCar extends Component {
             model: "",
             type: "",
             manufactureDate: "",
-            makeId:""
+            makeId: ""
         }
     }
     displayMakes(){
         //data object is attached to props when we bind a query to the export
-        let data = this.props.data
+        //changed data to getMakeQuery after adding compose
+        let data = this.props.getMakeQuery;
         if(data.loading){
             return <option disabled>loading makes</option>
         } else {
@@ -30,7 +32,20 @@ class AddCar extends Component {
     }
     submitForm(e) {
         e.preventDefault();
-        console.log(this.state);
+        //the name of this function inside props is given inside the object, inside the compose function
+        // at the bottom
+        // Inside this function we can pass the graphql variables that will be taken into account while
+        //running the query
+        console.log(this.state)
+        this.props.addCarMutation({
+            variables: {
+                model: this.state.model,
+                type: this.state.type,
+                manufactureDate: parseInt(this.state.manufactureDate),
+                makeId: this.state.makeId
+            },
+            refetchQueries: [{query: getCarQuery}]
+        });
     }
     render() {
         return (
@@ -39,7 +54,7 @@ class AddCar extends Component {
                    <div className="field">
                        <label>Car Model:</label>
                        {/* e is the event, target is the input, and value is what I type */}
-                       <input type="text" onChange={(e) => this.setState({name: e.target.value})} />
+                       <input type="text" onChange={(e) => this.setState({model: e.target.value})} />
                    </div>
                    <div className="field">
                        <label>Car type:</label>
@@ -67,4 +82,9 @@ class AddCar extends Component {
     }
 }
 
-export default graphql(getMakeQuery)(AddCar);
+//How to bind to queries to a component
+export default compose(
+    graphql(getMakeQuery, {name:"getMakeQuery"}),
+    graphql(addCarMutation, {name: "addCarMutation"})
+
+)(AddCar);

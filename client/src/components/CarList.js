@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/react-hoc';
 import { getCarQuery } from '../queries/queries';
-
+import CarDetails from './CarDetails'
 
 class CarList extends Component {
 
@@ -28,7 +28,7 @@ class CarList extends Component {
         return (
             <div id="car-list">
                 {this.displayCars()}
-                
+                <CarDetails/>
             </div>
         )
     }
