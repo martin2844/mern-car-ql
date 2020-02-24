@@ -14,7 +14,7 @@ import AddCar from './components/AddCar';
 //apollo client setup
 const client = new ApolloClient({
   //this is the endpoint where we have our graphql queries
-  uri: 'http://localhost:5000/graphql',
+  uri: 'https://car-graphql.herokuapp.com/graphql',
 })
 
 class App extends React.Component {
