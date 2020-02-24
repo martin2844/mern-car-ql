@@ -8,11 +8,13 @@ const schema = require('./schema/schema');
 //8. require mongoose
 const mongoose = require('mongoose');
 
+require('dotenv').config()
+
 //10.require cors
 const cors = require('cors');
 
 //9. Connect to mongodb using mongoose connect. Using Mongo Atlas
-mongoose.connect( "mongodb+srv://admin:algo1234@cluster0-ekehs.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect( "mongodb+srv://" + process.env.MONGO + "@cluster0-ekehs.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
    }).then(() => {
