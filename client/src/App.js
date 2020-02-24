@@ -1,7 +1,10 @@
 import React from 'react';
 import ApolloClient from 'apollo-boost';
 import {ApolloProvider} from '@apollo/react-hooks';
+import { Typography, Divider } from 'antd';
+import "antd/dist/antd.css";
 
+import "./App.css";
 
 
 import CarList from './components/CarList';
@@ -16,11 +19,13 @@ const client = new ApolloClient({
 
 class App extends React.Component {
   render() {
+    const { Title } = Typography;
     return (
       <ApolloProvider client={client}>
-      <div id="main">
+      <div id="main" >
 
-      <h1>My Favourite Cars</h1>
+      <Title level={1}>My Favourite Cars</Title>
+      <Divider /> 
       <CarList/>
 
       <AddCar/>

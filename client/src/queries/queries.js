@@ -39,7 +39,7 @@ mutation($model: String!, $type: String!, $manufactureDate: Int!, $makeId: ID!) 
 const getSingleCarQuery = gql`
 
 query($id: ID){
-    book(id: $id){
+    car(id: $id){
         id
         model
         type
@@ -49,6 +49,10 @@ query($id: ID){
             foundedDate
             country
             id
+            cars {
+                model
+                type
+            }
         }
     }
 }

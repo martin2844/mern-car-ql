@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { graphql } from '@apollo/react-hoc';
 import { getMakeQuery, addCarMutation, getCarQuery } from '../queries/queries';
 import compose from "lodash.flowright";
-
+import { Icon, Divider } from 'antd';
 
 
 class AddCar extends Component {
@@ -25,7 +25,7 @@ class AddCar extends Component {
         } else {
             return data.makes.map((make) => {
                 return (
-                    <option key={make.id} value={make.id}>{make.name}</option>
+                    <option className="ant-select-dropdown-menu-item" key={make.id} value={make.id}>{make.name}</option>
                 )
             })
         }
@@ -50,31 +50,34 @@ class AddCar extends Component {
     render() {
         return (
             <div>
+                <Divider />
+                <h1>Add a car!</h1>
                <form onSubmit={this.submitForm.bind(this)} id="add-car">
                    <div className="field">
                        <label>Car Model:</label>
                        {/* e is the event, target is the input, and value is what I type */}
-                       <input type="text" onChange={(e) => this.setState({model: e.target.value})} />
+                       <input className="ant-input" type="text" onChange={(e) => this.setState({model: e.target.value})} />
                    </div>
                    <div className="field">
                        <label>Car type:</label>
-                       <input type="text" onChange={(e) => this.setState({type: e.target.value})} />
+                       <input className="ant-input" type="text" onChange={(e) => this.setState({type: e.target.value})} />
                    </div>
                    
                    <div className="field">
                        <label>Car manufacture date:</label>
-                       <input type="number" onChange={(e) => this.setState({manufactureDate: e.target.value})}/>
+                       <input className="ant-input" type="number" onChange={(e) => this.setState({manufactureDate: e.target.value})}/>
                    </div>
                    <div className="field">
                        <label>Make</label>
-                       <select onChange={(e) => this.setState({makeId: e.target.value})}>
-                       <option>select make</option>
+                       <select className="ant-select ant-select-selected ant-input" onChange={(e) => this.setState({makeId: e.target.value})}>
+                       <option className="ant-select-dropdown-menu-item-group">select make</option>
                        {this.displayMakes()}
                        </select>
                    </div>
                    
-                   <button>Add</button>
-                   
+                   <button className="ant-btn ant-btn-primary ant-btn-circle ant-btn-lg ant-btn-icon-only" style={{marginTop: "20px"}} type="primary" shape="circle">
+                   <Icon type="plus" />
+                    </button>
                    
                </form> 
             </div>
