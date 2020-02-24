@@ -5,6 +5,9 @@ const graphqlHTTP = require('express-graphql');
 // 7.After defining schemas in schema.js, import it here 
 const schema = require('./schema/schema');
 
+//add dotenv for pushing to git...
+require('dotenv').config()
+
 //8. require mongoose
 const mongoose = require('mongoose');
 
@@ -12,7 +15,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 //9. Connect to mongodb using mongoose connect. Using Mongo Atlas
-mongoose.connect( "mongodb+srv://admin:algo1234@cluster0-ekehs.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect( "mongodb+srv://" + process.env.MONGO + "@cluster0-ekehs.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
    }).then(() => {
