@@ -9,3 +9,5 @@ They honeslty could be both hosted on heroku, just by adding the build file of r
 For now, it'll remain like this, as its just a proof of concept.
 
 Enter https://car-graphql.herokuapp.com/graphql to check available queries.
+
+Check the front end here: https://car-graphql.netlify.com/
